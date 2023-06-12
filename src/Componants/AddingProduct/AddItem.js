@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Button, Form, Input, Select, Space, Radio } from 'antd';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Button, Form, Input, Select, Space, Radio } from "antd";
 import currencyOptions from "./CurrencyData";
 import ImageUpload from "./ImageUpload";
 
@@ -25,24 +25,29 @@ const SubmitButton = ({ form }) => {
     const timestamp = new Date().toLocaleString();
     const payload = {
       id: Math.random().toString(36).substr(3, 11),
-      productName: form.getFieldValue('productName'),
-      cost: form.getFieldValue('cost'),
-      currency: form.getFieldValue('currency'),
+      productName: form.getFieldValue("productName"),
+      cost: form.getFieldValue("cost"),
+      currency: form.getFieldValue("currency"),
       timestamp: timestamp,
     };
 
     axios
-      .post('http://localhost:3004/Entry', payload)
+      .post("http://localhost:3004/Entry", payload)
       .then((response) => {
-        console.log('Data posted successfully:', response.data);
+        console.log("Data posted successfully:", response.data);
       })
       .catch((error) => {
-        console.error('Error posting data:', error);
+        console.error("Error posting data:", error);
       });
   };
 
   return (
-    <Button type="primary" htmlType="submit" disabled={!submittable} onClick={onFinish}>
+    <Button
+      type="primary"
+      htmlType="submit"
+      disabled={!submittable}
+      onClick={onFinish}
+    >
       Submit
     </Button>
   );
@@ -54,20 +59,33 @@ const AddItem = () => {
 
   const handleImageUploadChange = (e) => {
     const value = e.target.value;
-    setUploadImage(value === 'yes');
+    setUploadImage(value === "yes");
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-      <Form form={form} name="validateOnly" layout="vertical" autoComplete="off" style={{ width: '300px' }}>
-        <h1 style={{ textAlign: 'center' }}>Add Product</h1>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "80vh",
+      }}
+    >
+      <Form
+        form={form}
+        name="validateOnly"
+        layout="vertical"
+        autoComplete="off"
+        style={{ width: "300px" }}
+      >
+        <h1 style={{ textAlign: "center" }}>Add Product</h1>
         <Form.Item
           name="productName"
           label="Product Name"
           rules={[
             {
               required: true,
-              message: 'Please enter the product name',
+              message: "Please enter the product name",
             },
           ]}
         >
@@ -79,11 +97,21 @@ const AddItem = () => {
           rules={[
             {
               required: true,
-              message: 'Please enter the cost',
+              message: "Please enter the cost",
             },
             {
-              pattern: /^[0-9]*$/,
-              message: 'Please enter a valid cost (numbers only)',
+              pattern: /^(?!0+$)\d{2,}$/,
+              message: "Please enter a valid cost (at least two digits)",
+            },
+            {
+              validator: (_, value) => {
+                if (value && parseFloat(value) === 0) {
+                  return Promise.reject(
+                    new Error("The cost should be greater than 0")
+                  );
+                }
+                return Promise.resolve();
+              },
             },
           ]}
         >
@@ -95,13 +123,13 @@ const AddItem = () => {
           rules={[
             {
               required: true,
-              message: 'Please select the currency',
+              message: "Please select the currency",
             },
           ]}
         >
           <Select placeholder="Select currency">
-            {currencyOptions.map((option) => (
-              <Option key={option.value} value={option.value}>
+            {currencyOptions.map((option, index) => (
+              <Option key={`${option.value}-${index}`} value={option.value}>
                 {option.label}
               </Option>
             ))}
@@ -113,7 +141,7 @@ const AddItem = () => {
           rules={[
             {
               required: true,
-              message: 'Please select whether to upload an image',
+              message: "Please select whether to upload an image",
             },
           ]}
         >
@@ -122,7 +150,9 @@ const AddItem = () => {
             <Radio value="no">No</Radio>
           </Radio.Group>
         </Form.Item>
-        <div className={`image-upload-section ${uploadImage ? 'show' : 'hide'}`}>
+        <div
+          className={`image-upload-section ${uploadImage ? "show" : "hide"}`}
+        >
           <Form.Item name="image" label="Image">
             <ImageUpload />
           </Form.Item>
